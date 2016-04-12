@@ -15,7 +15,7 @@
 #2016/04/12
 ﻿
 ﻿
-﻿先后完成了CircleView的边界限制，两圆位置关系确定，单个CiecleView的点击回调等。效果图如下：
+﻿先后完成了CircleView的边界限制，两圆位置关系判定（相交不超过百分之30），单个CiecleView的点击回调等。效果图如下：
 ﻿
 ﻿
 ﻿![](https://github.com/tuozhaobing/ScaleDragCircleView/blob/master/listenerDemo.gif)
