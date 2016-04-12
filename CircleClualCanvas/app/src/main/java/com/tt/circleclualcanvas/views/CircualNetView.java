@@ -19,6 +19,7 @@ import android.view.animation.Transformation;
 import com.tt.circleclualcanvas.R;
 import com.tt.circleclualcanvas.entity.CircleView;
 import com.tt.circleclualcanvas.listener.OnCircleViewClickListener;
+import com.tt.circleclualcanvas.utils.MeasureUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,7 @@ public class CircualNetView extends View implements ViewTreeObserver.OnGlobalLay
     /*
     * CircualNetView的宽高
     * */
-    private int mViewWidth,mViewHeight;
+    private int mViewWidth,mViewHeight,mViewLeft,mViewTop;
 
     /*
     * 存储界面上所有圆的信息
@@ -174,7 +175,7 @@ public class CircualNetView extends View implements ViewTreeObserver.OnGlobalLay
         if (isFirstCreated){
             for (int i=0;i< mDrawingTextStrList.size();i++){
                 mTmpRadius = getRadius(mDrawingTextStrList.get(i).toString());
-                CircleView circleView = new CircleView(randomX(),randomY(),mTmpRadius,mDrawingTextStrList.get(i));
+                CircleView circleView = new CircleView(randomX(mTmpRadius),randomY(mTmpRadius),mTmpRadius,mDrawingTextStrList.get(i));
                 mCircleViews.add(circleView);
             }
             isFirstCreated = false;
@@ -204,22 +205,32 @@ public class CircualNetView extends View implements ViewTreeObserver.OnGlobalLay
     public void onGlobalLayout() {
         mViewWidth = getWidth();
         mViewHeight = getHeight();
+        mViewLeft = getLeft();
+        mViewTop = getTop();
     }
 
     /*
     * 随机生成圆心X坐标
     * */
-    public int randomX(){
+    public int randomX(int radius){
         Random random = new Random();
-        return random.nextInt(mViewWidth)+1;
+        int centerx = random.nextInt(mViewWidth)+1;
+        while(!judgeCircleCenterX(centerx,radius)){
+            centerx = random.nextInt(mViewWidth)+1;
+        }
+        return centerx;
     }
 
     /*
     * 随机生成圆心Y坐标
     * */
-    public int randomY(){
+    public int randomY(int radius){
         Random random = new Random();
-        return random.nextInt(mViewHeight)+1;
+        int centery = random.nextInt(mViewHeight)+1;
+        while(!judgeCircleCenterY(centery,radius)){
+            centery = random.nextInt(mViewHeight)+1;
+        }
+        return centery;
     }
 
     /*
@@ -227,6 +238,23 @@ public class CircualNetView extends View implements ViewTreeObserver.OnGlobalLay
     * */
     private int getRadius(String str){
         return str.length()*20;
+    }
+
+    /*
+    * 判断圆心坐标是否合法
+    * */
+    public boolean judgeCircleCenterX(int centerX,int radius){
+        if (centerX+radius > mViewWidth+mViewLeft || (centerX-radius)<mViewLeft){
+            return false;
+        }
+        return true;
+    }
+
+    public boolean judgeCircleCenterY(int centerY,int radius){
+        if (centerY+radius>mViewHeight+mViewTop || (centerY-radius)<mViewTop){
+            return false;
+        }
+        return true;
     }
 
     @Override
