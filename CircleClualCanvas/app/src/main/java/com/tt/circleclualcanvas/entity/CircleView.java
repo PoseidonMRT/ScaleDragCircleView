@@ -7,14 +7,25 @@ public class CircleView {
     public static final String TAG = "CircleView";
     private int mCenterX,mCenterY;
     private int mRadius;
+    private String mText;
 
     public CircleView() {
     }
 
-    public CircleView(int mCenterX, int mCenterY, int mRadius) {
+    public CircleView(int mCenterX, int mCenterY, int mRadius, String text) {
         this.mCenterX = mCenterX;
         this.mCenterY = mCenterY;
         this.mRadius = mRadius;
+        this.mText = text;
+
+    }
+
+    public String getmText() {
+        return mText;
+    }
+
+    public void setmText(String mText) {
+        this.mText = mText;
     }
 
     public int getmCenterX() {

@@ -18,6 +18,7 @@ import android.view.animation.Transformation;
 
 import com.tt.circleclualcanvas.R;
 import com.tt.circleclualcanvas.entity.CircleView;
+import com.tt.circleclualcanvas.listener.OnCircleViewClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,11 @@ public class CircualNetView extends View implements ViewTreeObserver.OnGlobalLay
 
     public static final String TAG = "CircualNetView";
     private Context mContext;
+
+    /*
+        * clickListener
+        * */
+    private OnCircleViewClickListener mCircleViewClickListener = null;
     /*
 	* 单指拖动
 	* */
@@ -53,9 +59,10 @@ public class CircualNetView extends View implements ViewTreeObserver.OnGlobalLay
     * 存储界面上所有圆的信息
     * */
     private List<CircleView> mCircleViews;
+
     /*
-    * 存储要绘制的所有字符串
-    * */
+        * 存储要绘制的所有字符串
+        * */
     private List<String> mDrawingTextStrList;
     /*
     * 画笔
@@ -69,10 +76,16 @@ public class CircualNetView extends View implements ViewTreeObserver.OnGlobalLay
     * 被点击的圆
     * */
     private CircleView mTouchedCircleView = null;
-    private int mTouchStartX,mTouchStartY,mTouchEndX,mTouchEndY;
+    private int mFirstX,mFirstY,mTouchStartX,mTouchStartY,mTouchEndX,mTouchEndY;
 
     private boolean isFirstCreated = true;
     public int touchPointIndex = -1;
+    /*
+    * flag to indicate event type
+    * false---click
+    * true ---Drag
+    * */
+    public boolean eventType = true;
 
     public CircualNetView(Context context) {
         super(context);
@@ -113,15 +126,55 @@ public class CircualNetView extends View implements ViewTreeObserver.OnGlobalLay
         getViewTreeObserver().addOnGlobalLayoutListener(this);
     }
 
+    public float getMIN_SCALE() {
+        return MIN_SCALE;
+    }
+
+    public void setMIN_SCALE(float MIN_SCALE) {
+        this.MIN_SCALE = MIN_SCALE;
+    }
+
+    public float getMAX_SCALE() {
+        return MAX_SCALE;
+    }
+
+    public void setMAX_SCALE(float MAX_SCALE) {
+        this.MAX_SCALE = MAX_SCALE;
+    }
+
+    public List<String> getDrawingTextStrList() {
+        return mDrawingTextStrList;
+    }
+
+    public void setDrawingTextStrList(List<String> mDrawingTextStrList) {
+        if (this.mDrawingTextStrList != null){
+            this.mDrawingTextStrList.clear();
+        }
+        if (this.mCircleViews != null){
+            this.mCircleViews.clear();
+        }
+        this.mDrawingTextStrList = mDrawingTextStrList;
+        isFirstCreated = true;
+        invalidate();
+    }
+
+    public void setCircleViewClickListener(OnCircleViewClickListener mCircleViewClickListener) {
+        this.mCircleViewClickListener = mCircleViewClickListener;
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
-        Log.e(TAG,mScaleFactor+"  SCALE");
+        if (mScaleFactor <= MIN_SCALE){
+            mScaleFactor = MIN_SCALE;
+        }else if (mScaleFactor >= MAX_SCALE){
+            mScaleFactor = MAX_SCALE;
+        }
         setScaleX(mScaleFactor);
         setScaleY(mScaleFactor);
         if (isFirstCreated){
             for (int i=0;i< mDrawingTextStrList.size();i++){
                 mTmpRadius = getRadius(mDrawingTextStrList.get(i).toString());
-                CircleView circleView = new CircleView(randomX(),randomY(),mTmpRadius);
+                CircleView circleView = new CircleView(randomX(),randomY(),mTmpRadius,mDrawingTextStrList.get(i));
                 mCircleViews.add(circleView);
             }
             isFirstCreated = false;
@@ -142,7 +195,7 @@ public class CircualNetView extends View implements ViewTreeObserver.OnGlobalLay
         * 画字
         * */
         for (int i=0;i<mCircleViews.size();i++){
-            canvas.drawText(mDrawingTextStrList.get(i),mCircleViews.get(i).getmCenterX(),mCircleViews.get(i).getmCenterY(),mTextPaint);
+            canvas.drawText(mCircleViews.get(i).getmText(),mCircleViews.get(i).getmCenterX(),mCircleViews.get(i).getmCenterY(),mTextPaint);
         }
         super.onDraw(canvas);
     }
@@ -184,11 +237,14 @@ public class CircualNetView extends View implements ViewTreeObserver.OnGlobalLay
             case MotionEvent.ACTION_DOWN:{
                 mTouchStartX = (int)event.getX();
                 mTouchStartY = (int)event.getY();
+                mFirstX = (int)event.getRawX();
+                mFirstY = (int)event.getRawY();
                 mTouchedCircleView = getTouchedCircle(mTouchStartX,mTouchStartY);
                 break;
             }
             case MotionEvent.ACTION_MOVE:{
                 if (mTouchedCircleView != null){
+                    eventType = true;
                     mTouchedCircleView.setmCenterX(mTouchStartX);
                     mTouchedCircleView.setmCenterY(mTouchStartY);
                     mTouchStartX = (int)event.getX();
@@ -198,6 +254,13 @@ public class CircualNetView extends View implements ViewTreeObserver.OnGlobalLay
                 break;
             }
             case MotionEvent.ACTION_UP:{
+                mTouchEndX = (int)event.getRawX();
+                mTouchEndY = (int)event.getRawY();
+                if ((mTouchedCircleView != null) && (Math.abs(mTouchEndX - mFirstX) == 0 && Math.abs(mTouchEndY - mFirstY) == 0)){
+                    mCircleViewClickListener.onClick(mTouchedCircleView.getmText());
+                }else{
+                    eventType = true;
+                }
                 break;
             }
         }
