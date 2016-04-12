@@ -175,7 +175,11 @@ public class CircualNetView extends View implements ViewTreeObserver.OnGlobalLay
         if (isFirstCreated){
             for (int i=0;i< mDrawingTextStrList.size();i++){
                 mTmpRadius = getRadius(mDrawingTextStrList.get(i).toString());
-                CircleView circleView = new CircleView(randomX(mTmpRadius),randomY(mTmpRadius),mTmpRadius,mDrawingTextStrList.get(i));
+                CircleView circleView = null;
+                circleView = new CircleView(randomX(mTmpRadius),randomY(mTmpRadius),mTmpRadius,mDrawingTextStrList.get(i));
+                while(!judge2CircleLocationLegal(circleView)){
+                    circleView = new CircleView(randomX(mTmpRadius),randomY(mTmpRadius),mTmpRadius,mDrawingTextStrList.get(i));
+                }
                 mCircleViews.add(circleView);
             }
             isFirstCreated = false;
@@ -209,6 +213,38 @@ public class CircualNetView extends View implements ViewTreeObserver.OnGlobalLay
         mViewTop = getTop();
     }
 
+    /*
+    * 判断生成的圆有没有和其他圆相交或重叠
+    * */
+    public boolean judge2CircleLocationLegal(CircleView circleView){
+        for (CircleView circleView1:mCircleViews){
+            if ((get2CircleViewCenterDistance(circleView,circleView1) <= get2CircleViewRediusMild(circleView,circleView1)*0.3)
+                    || (get2CircleViewCenterDistance(circleView,circleView1) <= get2CircleViewRadiusSub(circleView,circleView1))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /*
+    * 得到两圆圆心之间的距离
+    * */
+    public int get2CircleViewCenterDistance(CircleView circleView,CircleView cirr){
+        return (circleView.getmCenterY()-cirr.getmCenterY())*(circleView.getmCenterY()-cirr.getmCenterY())+(circleView.getmCenterX()-cirr.getmCenterX())*(circleView.getmCenterX()-cirr.getmCenterX());
+    }
+    /*
+    * 得到两圆半径和
+    * */
+    public int get2CircleViewRediusMild(CircleView circleView,CircleView crr){
+        return (circleView.getmRadius()+crr.getmRadius())*(circleView.getmRadius()+crr.getmRadius());
+    }
+
+    /*
+    * 得到两圆半径差
+    * */
+    public int get2CircleViewRadiusSub(CircleView circleView,CircleView crr){
+        return (circleView.getmRadius()-crr.getmRadius())*(circleView.getmRadius()-crr.getmRadius());
+    }
     /*
     * 随机生成圆心X坐标
     * */
