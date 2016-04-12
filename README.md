@@ -3,7 +3,7 @@
 #2016/04/11
 ﻿
 ﻿
-﻿提交主要核新代码，完成了CircleView的绘制以及单指拖动双指放缩等，效果如下：
+﻿提交主要核心代码，完成了CircleView的绘制以及单指拖动双指放缩等，效果如下：
 ﻿
 ﻿
 ﻿![](https://github.com/tuozhaobing/ScaleDragCircleView/blob/master/demolarge.gif)
