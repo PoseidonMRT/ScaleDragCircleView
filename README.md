@@ -1,6 +1,6 @@
 ﻿#ScaleDragCircleView
 ﻿
-﻿##2016/04/11
+#2016/04/11
 ﻿
 ﻿
 ﻿提交主要核新代码，完成了CircleView的绘制以及单指拖动双指放缩等，效果如下：
@@ -9,7 +9,10 @@
 ﻿![](https://github.com/tuozhaobing/ScaleDragCircleView/blob/master/demolarge.gif)
 ﻿
 ﻿
-﻿##2016/04/12
+﻿
+﻿
+﻿
+#2016/04/12
 ﻿
 ﻿
 ﻿先后完成了CircleView的边界限制，两圆位置关系确定，单个CiecleView的点击回调等。效果图如下：
